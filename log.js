@@ -4,7 +4,7 @@ const logSchema = new mongoose.Schema({
   sender: String,
   receiver: String,
   message: String,
-  date: Date,
+  date: String,
 });
 
 const Log = mongoose.model("Log", logSchema);
