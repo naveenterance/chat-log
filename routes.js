@@ -1,13 +1,11 @@
 const express = require("express");
 const Log = require("./log");
-const moment = require("moment");
+
 const router = express.Router();
 
-const currentDate = moment();
-const formattedDate = currentDate.format("HH:mm ddd DD MMM YYYY ");
 // Create a new user
 router.post("/log", async (req, res) => {
-  const { sender, receiver, message, date = formattedDate } = req.body;
+  const { sender, receiver, message, date = new Date() } = req.body;
 
   try {
     const user = new Log({ sender, receiver, message, date });
