@@ -68,7 +68,7 @@ router.get("/log/:id", async (req, res) => {
   try {
     const filteredEntries = await Log.find({
       $or: [{ sender: id }, { receiver: id }],
-    }).sort({ date: "desc" });
+    });
 
     console.log(filteredEntries);
     res.send(filteredEntries);
@@ -87,6 +87,29 @@ router.get("/contacts/:sender", async (req, res) => {
       message: "[Added as a contact]",
     }).distinct("receiver");
     res.json({ receivers });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+router.delete("/contacts/:sender/:receiver", async (req, res) => {
+  const { sender, receiver } = req.params;
+
+  try {
+    // Delete log entries where sender, receiver, and message match
+    await Log.deleteMany({
+      sender,
+      receiver,
+      message: "[Added as a contact]",
+    });
+
+    // Fetch updated list of receivers after deletion
+    const updatedReceivers = await Log.find({
+      sender,
+      message: "[Added as a contact]",
+    }).distinct("receiver");
+
+    res.json({ receivers: updatedReceivers });
   } catch (error) {
     console.error(error);
     res.status(500).send(error);
