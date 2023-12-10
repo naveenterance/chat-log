@@ -1,11 +1,13 @@
 const express = require("express");
 const Log = require("./log");
+const moment = require("moment");
 
 const router = express.Router();
 
 // Create a new user
 router.post("/log", async (req, res) => {
-  const { sender, receiver, message, date = new Date() } = req.body;
+  const formattedDate = moment().format("MMMM Do YYYY, h:mm:ss a");
+  const { sender, receiver, message, date = formattedDate } = req.body;
 
   try {
     const user = new Log({ sender, receiver, message, date });
@@ -85,7 +87,10 @@ router.get("/contacts/:sender", async (req, res) => {
     const receivers = await Log.find({
       sender,
       message: "[Added as a contact]",
-    }).distinct("receiver");
+    })
+      .distinct("receiver")
+      .collation({ locale: "en", strength: 2 })
+      .sort();
     res.json({ receivers });
   } catch (error) {
     console.error(error);
